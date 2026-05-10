@@ -1,7 +1,7 @@
-package com.waterpermit.service;
+package com.watersupervision.service;
 
-import com.waterpermit.entity.Material;
-import com.waterpermit.repository.MaterialRepository;
+import com.watersupervision.entity.Material;
+import com.watersupervision.repository.MaterialRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class MaterialService {
 
     private final MaterialRepository materialRepository;
-    private final Path uploadDir = Paths.get("./uploads");
+    private final Path uploadDir = Paths.get("./uploads").toAbsolutePath().normalize();
 
     public MaterialService(MaterialRepository materialRepository) {
         this.materialRepository = materialRepository;
@@ -74,6 +74,7 @@ public class MaterialService {
         String originalName = file.getOriginalFilename();
         String storedName = UUID.randomUUID() + "_" + (originalName != null ? originalName : "file");
         try {
+            Files.createDirectories(uploadDir);
             Path target = uploadDir.resolve(storedName);
             file.transferTo(target.toFile());
             return storedName;

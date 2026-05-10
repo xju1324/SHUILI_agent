@@ -1,15 +1,16 @@
 <template>
   <div id="app">
     <header class="app-header">
-      <h1>取水许可材料智能审查系统</h1>
+      <router-link to="/" class="logo">涉水审批智能审核系统</router-link>
       <nav>
-        <router-link to="/">材料列表</router-link>
-        <router-link to="/create">新建材料</router-link>
+        <router-link to="/">首页</router-link>
       </nav>
     </header>
-    <main class="app-main">
-      <router-view />
-    </main>
+    <div class="app-body">
+      <main class="app-main">
+        <router-view />
+      </main>
+    </div>
   </div>
 </template>
 
@@ -18,23 +19,29 @@
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: 'Microsoft YaHei', sans-serif; background: #f5f7fa; color: #333; }
+body { font-family: 'Microsoft YaHei', sans-serif; background: #f0f2f5; color: #333; }
 .app-header {
   background: #1a73e8;
   color: white;
-  padding: 16px 32px;
+  padding: 0 32px;
+  height: 56px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
-.app-header h1 { font-size: 20px; }
+.logo { color: white; font-size: 18px; font-weight: 700; text-decoration: none; }
 .app-header nav a {
-  color: white;
+  color: rgba(255,255,255,0.85);
   margin-left: 24px;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 14px;
 }
-.app-header nav a:hover { text-decoration: underline; }
-.app-header nav a.router-link-active { font-weight: bold; }
-.app-main { max-width: 1200px; margin: 24px auto; padding: 0 16px; }
+.app-header nav a:hover { color: white; }
+.app-header nav a.router-link-active { color: white; font-weight: bold; }
+.app-body { display: flex; min-height: calc(100vh - 56px); }
+.app-main { flex: 1; max-width: 1200px; margin: 0 auto; padding: 24px 16px; width: 100%; }
 </style>

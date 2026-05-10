@@ -1,11 +1,11 @@
-package com.waterpermit;
+package com.watersupervision;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class WaterPermitApplication {
+public class WaterSupervisionApplication {
     public static void main(String[] args) {
-        SpringApplication.run(WaterPermitApplication.class, args);
+        SpringApplication.run(WaterSupervisionApplication.class, args);
     }
 }

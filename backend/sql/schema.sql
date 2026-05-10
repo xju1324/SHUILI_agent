@@ -1,14 +1,14 @@
 -- ============================================
--- 取水许可材料智能审查系统 - 数据库初始化脚本
+-- 涉水审批智能审核系统 - 数据库初始化脚本
 -- 数据库: MySQL 8.0
 -- 编码: utf8mb4
 -- ============================================
-
-CREATE DATABASE IF NOT EXISTS water_permit_review
-    DEFAULT CHARACTER SET utf8mb4
+DEFAULT CHARACTER SET utf8mb4
     DEFAULT COLLATE utf8mb4_unicode_ci;
 
-USE water_permit_review;
+USE water_supervision_review;
+CREATE DATABASE IF NOT EXISTS water_supervision_review
+
 
 -- 用户表
 CREATE TABLE IF NOT EXISTS users (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB COMMENT='系统用户表';
 
--- 取水许可申请材料表
+-- 涉水审批申请材料表
 CREATE TABLE IF NOT EXISTS materials (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     applicant_id BIGINT COMMENT '申请人ID',
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS materials (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (applicant_id) REFERENCES users(id) ON DELETE SET NULL
-) ENGINE=InnoDB COMMENT='取水许可申请材料表';
+) ENGINE=InnoDB COMMENT='涉水审批申请材料表';
 
 -- 审查记录表
 CREATE TABLE IF NOT EXISTS review_records (
@@ -83,3 +83,12 @@ CREATE TABLE IF NOT EXISTS knowledge_documents (
 -- 插入默认管理员用户
 INSERT INTO users (username, password, real_name, role) VALUES
 ('admin', '$2a$10$placeholder_hash', '系统管理员', 'ADMIN');
+
+-- ============================================
+-- 节点二：六类涉水审批扩展
+-- ============================================
+ALTER TABLE materials
+    ADD COLUMN category ENUM('WATER_INTAKE', 'FLOOD_IMPACT', 'SOIL_CONSERVATION',
+                             'RIVER_CONSTRUCTION', 'SEWAGE_OUTLET', 'SAND_MINING')
+    DEFAULT 'WATER_INTAKE' COMMENT '审批类型' AFTER title,
+    ADD COLUMN form_data TEXT COMMENT '审批类型专属字段(JSON格式)' AFTER other_files_path;

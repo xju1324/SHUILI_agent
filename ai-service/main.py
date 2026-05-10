@@ -1,5 +1,5 @@
 """
-取水许可材料智能审查系统 - Python AI 服务
+涉水审批智能审核系统 - Python AI 服务
 FastAPI + LangChain + ChromaDB + MCP
 """
 from fastapi import FastAPI
@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from config import HOST, PORT
 
 app = FastAPI(
-    title="取水许可材料智能审查 AI 服务",
+    title="涉水审批智能审核 AI 服务",
     description="提供 RAG 检索、合规审查、MCP 工具调用能力",
     version="1.0.0"
 )
@@ -23,7 +23,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health():
-    return {"status": "ok", "service": "water-permit-ai"}
+    return {"status": "ok", "service": "water-supervision-ai"}
 
 
 @app.get("/api/review")

@@ -1,8 +1,8 @@
-# 取水许可材料智能审查系统
+# 涉水审批智能审核系统
 
 ## 项目简介
 
-本项目是一个基于 **Java + Python 双栈架构** 的智能审查系统，用于自动检查取水许可申请材料的合规性。系统通过 LangChain Agent 结合 MCP 协议，调用知识库（RAG）对申请材料进行形式审查、数据规范审查和实质合规审查。
+本项目是一个基于 **Java + Python 双栈架构** 的智能审查系统，用于自动检查涉水审批申请材料的合规性。系统通过 LangChain Agent 结合 MCP 协议，调用知识库（RAG）对申请材料进行形式审查、数据规范审查和实质合规审查。
 
 ## 技术架构
 
@@ -38,8 +38,8 @@
 ├── backend/                  # Java Spring Boot 后端
 │   ├── pom.xml               # Maven 配置
 │   ├── sql/schema.sql        # MySQL 数据库初始化脚本
-│   └── src/main/java/com/waterpermit/
-│       ├── WaterPermitApplication.java
+│   └── src/main/java/com/watersupervision/
+│       ├── WaterSupervisionApplication.java
 │       ├── config/CorsConfig.java
 │       ├── entity/           # 数据实体 (User, Material, ReviewRecord)
 │       ├── repository/       # JPA 数据访问层

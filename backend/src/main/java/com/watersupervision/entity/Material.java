@@ -1,4 +1,4 @@
-package com.waterpermit.entity;
+package com.watersupervision.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,6 +20,9 @@ public class Material {
 
     @Column(nullable = false, length = 200)
     private String title;
+
+    @Enumerated(EnumType.STRING)
+    private MaterialCategory category = MaterialCategory.WATER_INTAKE;
 
     @Enumerated(EnumType.STRING)
     private MaterialStatus status = MaterialStatus.DRAFT;
@@ -63,6 +66,9 @@ public class Material {
     @Column(columnDefinition = "TEXT")
     private String otherFilesPath;
 
+    @Column(columnDefinition = "TEXT")
+    private String formData;
+
     private LocalDateTime submitTime;
     private LocalDateTime reviewTime;
 
@@ -84,5 +90,10 @@ public class Material {
 
     public enum MaterialStatus {
         DRAFT, SUBMITTED, REVIEWING, APPROVED, REJECTED
+    }
+
+    public enum MaterialCategory {
+        WATER_INTAKE, FLOOD_IMPACT, SOIL_CONSERVATION,
+        RIVER_CONSTRUCTION, SEWAGE_OUTLET, SAND_MINING
     }
 }

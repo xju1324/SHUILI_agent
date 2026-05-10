@@ -1,4 +1,4 @@
-package com.waterpermit.config;
+package com.watersupervision.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -16,4 +16,4 @@ EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-zh-v1.5")
 KNOWLEDGE_DIR = os.getenv("KNOWLEDGE_DIR", "../docs/knowledge")
 
 # MCP Server 名称
-MCP_SERVER_NAME = "water-permit-mcp"
+MCP_SERVER_NAME = "water-supervision-mcp"

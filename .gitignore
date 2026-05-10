@@ -34,3 +34,4 @@ uploads/
 *.tmp
 *.doc
 guidebook_output*
+.claude/

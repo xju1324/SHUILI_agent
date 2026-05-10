@@ -1,4 +1,4 @@
-package com.waterpermit.service;
+package com.watersupervision.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;

@@ -1,7 +1,7 @@
-package com.waterpermit.controller;
+package com.watersupervision.controller;
 
-import com.waterpermit.entity.Material;
-import com.waterpermit.service.MaterialService;
+import com.watersupervision.entity.Material;
+import com.watersupervision.service.MaterialService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
