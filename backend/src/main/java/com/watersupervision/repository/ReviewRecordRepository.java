@@ -1,6 +1,6 @@
-package com.waterpermit.repository;
+package com.watersupervision.repository;
 
-import com.waterpermit.entity.ReviewRecord;
+import com.watersupervision.entity.ReviewRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;

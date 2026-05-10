@@ -1,6 +1,6 @@
 <template>
   <div class="material-form">
-    <h2>新建取水许可申请材料</h2>
+    <h2>新建涉水审批申请材料</h2>
 
     <form @submit.prevent="handleCreate" class="form-card">
       <div class="form-group">

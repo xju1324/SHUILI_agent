@@ -1,7 +1,7 @@
-package com.waterpermit.service;
+package com.watersupervision.service;
 
-import com.waterpermit.entity.Material;
-import com.waterpermit.repository.MaterialRepository;
+import com.watersupervision.entity.Material;
+import com.watersupervision.repository.MaterialRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;

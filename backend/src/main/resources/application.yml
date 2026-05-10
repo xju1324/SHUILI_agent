@@ -3,10 +3,10 @@ server:
 
 spring:
   application:
-    name: water-permit-review
+    name: water-supervision-review
 
   datasource:
-    url: jdbc:mysql://localhost:3306/water_permit_review?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8mb4
+    url: jdbc:mysql://localhost:3306/water_supervision_review?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8mb4
     username: root
     password: your_password_here
     driver-class-name: com.mysql.cj.jdbc.Driver

@@ -1,4 +1,4 @@
-package com.waterpermit.entity;
+package com.watersupervision.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;

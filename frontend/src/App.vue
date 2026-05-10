@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <header class="app-header">
-      <h1>取水许可材料智能审查系统</h1>
+      <h1>涉水审批智能审核系统</h1>
       <nav>
         <router-link to="/">材料列表</router-link>
         <router-link to="/create">新建材料</router-link>
