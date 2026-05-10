@@ -1,0 +1,36 @@
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Java
+backend/target/
+backend/*.jar
+backend/*.war
+
+# Python
+ai-service/__pycache__/
+ai-service/app/__pycache__/
+ai-service/app/*/__pycache__/
+ai-service/*.pyc
+ai-service/.venv/
+ai-service/venv/
+ai-service/chroma_db/
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads
+uploads/
+*.log
+
+# Temp
+~$*
+*.tmp
+*.doc
+guidebook_output*

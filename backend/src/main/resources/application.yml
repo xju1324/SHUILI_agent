@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: water-permit-review
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/water_permit_review?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=utf8mb4
+    username: root
+    password: your_password_here
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 100MB
+
+# Python AI服务地址
+ai-service:
+  base-url: http://localhost:8000
+  mcp-endpoint: /mcp
+
+# 文件上传路径
+file:
+  upload-dir: ./uploads
