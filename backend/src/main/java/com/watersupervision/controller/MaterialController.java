@@ -1,7 +1,10 @@
 package com.watersupervision.controller;
 
 import com.watersupervision.entity.Material;
+import com.watersupervision.entity.User;
+import com.watersupervision.repository.UserRepository;
 import com.watersupervision.service.MaterialService;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,9 +18,11 @@ import java.util.Map;
 public class MaterialController {
 
     private final MaterialService materialService;
+    private final UserRepository userRepository;
 
-    public MaterialController(MaterialService materialService) {
+    public MaterialController(MaterialService materialService, UserRepository userRepository) {
         this.materialService = materialService;
+        this.userRepository = userRepository;
     }
 
     /** 材料列表 */
@@ -36,7 +41,12 @@ public class MaterialController {
 
     /** 创建材料 */
     @PostMapping
-    public ResponseEntity<Material> create(@RequestBody Material material) {
+    public ResponseEntity<Material> create(@RequestBody Material material, HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        if (userId != null) {
+            User user = userRepository.findById(userId).orElse(null);
+            material.setApplicant(user);
+        }
         return ResponseEntity.ok(materialService.create(material));
     }
 
