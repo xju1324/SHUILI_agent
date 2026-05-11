@@ -34,7 +34,7 @@ public class AuthService {
         user.setRole(User.UserRole.APPLICANT);
         userRepository.save(user);
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole().name());
-        return new LoginResponse(token, user.getId(), user.getUsername(), user.getRealName(), user.getRole().name());
+        return new LoginResponse(token, user.getId(), user.getUsername(), user.getRealName(), user.getRole().name(), user.getEmail(), user.getPhone());
     }
 
     public LoginResponse login(LoginRequest req) {
@@ -44,12 +44,12 @@ public class AuthService {
             throw new RuntimeException("用户名或密码错误");
         }
         String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole().name());
-        return new LoginResponse(token, user.getId(), user.getUsername(), user.getRealName(), user.getRole().name());
+        return new LoginResponse(token, user.getId(), user.getUsername(), user.getRealName(), user.getRole().name(), user.getEmail(), user.getPhone());
     }
 
     public LoginResponse getCurrentUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
-        return new LoginResponse(null, user.getId(), user.getUsername(), user.getRealName(), user.getRole().name());
+        return new LoginResponse(null, user.getId(), user.getUsername(), user.getRealName(), user.getRole().name(), user.getEmail(), user.getPhone());
     }
 }

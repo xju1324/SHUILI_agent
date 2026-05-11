@@ -31,6 +31,13 @@ public class MaterialController {
         return ResponseEntity.ok(materialService.listAll());
     }
 
+    /** 我的材料 */
+    @GetMapping("/my")
+    public ResponseEntity<List<Material>> myMaterials(HttpServletRequest request) {
+        Long userId = (Long) request.getAttribute("userId");
+        return ResponseEntity.ok(materialService.listByApplicant(userId));
+    }
+
     /** 材料详情 */
     @GetMapping("/{id}")
     public ResponseEntity<Material> detail(@PathVariable Long id) {

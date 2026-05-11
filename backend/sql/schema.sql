@@ -3,11 +3,12 @@
 -- 数据库: MySQL 8.0
 -- 编码: utf8mb4
 -- ============================================
-DEFAULT CHARACTER SET utf8mb4
+
+CREATE DATABASE IF NOT EXISTS water_supervision_review
+    DEFAULT CHARACTER SET utf8mb4
     DEFAULT COLLATE utf8mb4_unicode_ci;
 
 USE water_supervision_review;
-CREATE DATABASE IF NOT EXISTS water_supervision_review
 
 
 -- 用户表
@@ -28,6 +29,9 @@ CREATE TABLE IF NOT EXISTS materials (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     applicant_id BIGINT COMMENT '申请人ID',
     title VARCHAR(200) NOT NULL COMMENT '材料标题/项目名称',
+    category ENUM('WATER_INTAKE', 'FLOOD_IMPACT', 'SOIL_CONSERVATION',
+                  'RIVER_CONSTRUCTION', 'SEWAGE_OUTLET', 'SAND_MINING')
+        DEFAULT 'WATER_INTAKE' COMMENT '审批类型',
     status ENUM('DRAFT', 'SUBMITTED', 'REVIEWING', 'APPROVED', 'REJECTED') DEFAULT 'DRAFT' COMMENT '审查状态',
     -- 申请核心信息
     project_name VARCHAR(200) COMMENT '建设项目名称',
@@ -44,6 +48,7 @@ CREATE TABLE IF NOT EXISTS materials (
     id_card_path VARCHAR(500) COMMENT '身份证件路径',
     water_certificate_path VARCHAR(500) COMMENT '水资源论证报告路径',
     other_files_path TEXT COMMENT '其他附件路径(JSON数组)',
+    form_data TEXT COMMENT '审批类型专属字段(JSON格式)',
     -- 时间戳
     submit_time DATETIME COMMENT '提交时间',
     review_time DATETIME COMMENT '审查完成时间',
@@ -80,9 +85,9 @@ CREATE TABLE IF NOT EXISTS knowledge_documents (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB COMMENT='知识库文档索引表';
 
--- 插入默认管理员用户
+-- 插入默认管理员用户  admin admin123
 INSERT INTO users (username, password, real_name, role) VALUES
-('admin', '$2a$10$placeholder_hash', '系统管理员', 'ADMIN');
+('admin', '$2b$12$Th82Y2Z63BevknZwhCUQgeorzCp813G1rJED/PCeT1VG230raoTRW', '系统管理员', 'ADMIN');
 
 -- ============================================
 -- 节点二：六类涉水审批扩展

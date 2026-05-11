@@ -35,6 +35,10 @@ public class MaterialService {
         return materialRepository.findAll();
     }
 
+    public List<Material> listByApplicant(Long applicantId) {
+        return materialRepository.findByApplicantIdOrderByCreatedAtDesc(applicantId);
+    }
+
     public Optional<Material> getById(Long id) {
         return materialRepository.findById(id);
     }
