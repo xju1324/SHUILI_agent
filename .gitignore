@@ -29,6 +29,9 @@ Thumbs.db
 uploads/
 *.log
 
+# Env
+.env
+
 # Temp
 ~$*
 *.tmp
