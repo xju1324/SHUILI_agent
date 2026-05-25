@@ -48,6 +48,25 @@
         </ul>
         <p v-if="!hasFiles" class="no-files">暂无附件</p>
       </div>
+
+      <!-- 审核记录 -->
+      <div class="reviews-section" v-if="reviewRecords.length">
+        <div class="section-title">AI 审核结果 ({{ reviewRecords.length }} 条)</div>
+        <div class="review-record" v-for="r in reviewRecords" :key="r.id" :class="recordClass(r)">
+          <div class="record-header">
+            <span class="record-type">{{ typeLabel(r.reviewType) }}</span>
+            <span class="record-severity" :class="'sev-' + (r.severity || 'INFO')">{{ severityLabel(r.severity) }}</span>
+          </div>
+          <div class="record-body">{{ r.issueDescription }}</div>
+          <div class="record-footer" v-if="r.suggestion">
+            <strong>建议：</strong>{{ r.suggestion }}
+          </div>
+        </div>
+      </div>
+      <div class="reviews-section" v-else-if="material.status === 'REVIEWING'">
+        <div class="section-title">AI 审核结果</div>
+        <p class="reviewing-hint">正在审查中，请稍候...</p>
+      </div>
     </div>
 
     <router-link to="/" class="btn btn-back">返回列表</router-link>
@@ -62,6 +81,7 @@ import { materialApi } from '../api'
 const route = useRoute()
 const router = useRouter()
 const material = ref(null)
+const reviewRecords = ref([])
 
 const categoryMap = {
   WATER_INTAKE: '取水许可', FLOOD_IMPACT: '洪水影响评价', SOIL_CONSERVATION: '水土保持方案',
@@ -69,44 +89,44 @@ const categoryMap = {
 }
 
 const fieldLabelMap = {
-  // 取水许可
-  waterIntakeLocation: '取水地点', waterIntakePurpose: '取水用途', annualWaterVolume: '年取水量(万m³)', waterSourceType: '水源类型',
-  // 洪水影响评价
-  projectLocation: '项目地点', riverName: '河流名称', floodControlStandard: '防洪标准', constructionContent: '建设内容',
-  // 水土保持方案
-  projectArea: '占地面积(hm²)', soilLossAmount: '土壤流失量(t/a)', conservationMeasures: '水土保持措施',
-  // 河道管理范围建设项目
+  waterIntakeLocation: '取水地点', waterIntakePurpose: '取水用途', annualWaterVolume: '年取水量(万m³)',
+  waterSourceType: '水源类型', projectLocation: '项目地点', riverName: '河流名称',
+  floodControlStandard: '防洪标准', constructionContent: '建设内容', projectArea: '占地面积(hm²)',
+  soilLossAmount: '土壤流失量(t/a)', conservationMeasures: '水土保持措施',
   constructionType: '建设类型', occupationLength: '占用河道长度(m)',
-  // 入河排污口设置
-  outletLocation: '排污口位置', sewageType: '污水类型', dischargeAmount: '排放量(m³/d)', dischargeStandard: '排放标准', receivingWater: '受纳水体',
-  // 河道采砂许可
-  riverSection: '采砂河段', sandType: '砂石种类', annualMiningAmount: '年开采量(万t)', miningMethod: '开采方式'
+  outletLocation: '排污口位置', sewageType: '污水类型', dischargeAmount: '排放量(m³/d)',
+  dischargeStandard: '排放标准', receivingWater: '受纳水体', riverSection: '采砂河段',
+  sandType: '砂石种类', annualMiningAmount: '年开采量(万t)', miningMethod: '开采方式'
 }
 
 const categoryLabel = computed(() => categoryMap[material.value?.category] || '未知类型')
 
 const typeFieldItems = computed(() => {
   if (!material.value) return []
-  // Try formData JSON first
   let fd = {}
   try {
     if (material.value.formData) fd = JSON.parse(material.value.formData)
   } catch (e) { /* ignore */ }
-  // Also include legacy dedicated columns for WATER_INTAKE
   if (material.value.category === 'WATER_INTAKE' && !fd.waterIntakeLocation && material.value.waterIntakeLocation) {
     fd.waterIntakeLocation = material.value.waterIntakeLocation
     fd.waterIntakePurpose = material.value.waterIntakePurpose
     if (material.value.annualWaterVolume) fd.annualWaterVolume = material.value.annualWaterVolume
   }
-  return Object.entries(fd).map(([k, v]) => ({
-    label: fieldLabelMap[k] || k,
-    value: v
-  }))
+  return Object.entries(fd).map(([k, v]) => ({ label: fieldLabelMap[k] || k, value: v }))
 })
 
 const statusMap = { DRAFT: '草稿', SUBMITTED: '已提交', REVIEWING: '审查中', APPROVED: '已通过', REJECTED: '未通过' }
 const statusLabel = (s) => statusMap[s] || s
-const statusClass = (s) => 'tag ' + ({ DRAFT: 'tag-gray', SUBMITTED: 'tag-blue', APPROVED: 'tag-green', REJECTED: 'tag-red' }[s] || '')
+const statusClass = (s) => 'tag ' + ({ DRAFT: 'tag-gray', SUBMITTED: 'tag-blue', REVIEWING: 'tag-orange', APPROVED: 'tag-green', REJECTED: 'tag-red' }[s] || '')
+
+const typeLabel = (t) => ({ FORMAT: '格式审查', DATA_STANDARD: '数据规范', COMPLIANCE: '合规审查' }[t] || t)
+const severityLabel = (s) => ({ INFO: '信息', WARNING: '警告', ERROR: '错误' }[s] || s)
+
+const recordClass = (r) => {
+  if (r.severity === 'ERROR' && r.isPass === false) return 'record-error'
+  if (r.severity === 'WARNING') return 'record-warning'
+  return 'record-info'
+}
 
 const hasFiles = computed(() =>
   material.value && (
@@ -120,7 +140,15 @@ const hasFiles = computed(() =>
 const fetchDetail = async () => {
   try {
     const res = await materialApi.detail(route.params.id)
-    material.value = res.data
+    // 新接口返回 { material, reviewRecords }
+    if (res.data.material) {
+      material.value = res.data.material
+      reviewRecords.value = res.data.reviewRecords || []
+    } else {
+      // 兼容旧格式
+      material.value = res.data
+      reviewRecords.value = []
+    }
   } catch (e) {
     alert('加载详情失败')
     router.push('/')
@@ -157,16 +185,31 @@ onMounted(fetchDetail)
 .detail-item { margin-bottom: 8px; display: flex; }
 .detail-item label { font-weight: 600; color: #666; width: 140px; flex-shrink: 0; font-size: 13px; }
 .detail-item span { font-size: 14px; }
-.files-section { margin-top: 0; }
 .files-section li { margin-bottom: 6px; color: #1a73e8; font-size: 14px; }
 .no-files { color: #999; }
 .tag { padding: 2px 10px; border-radius: 12px; font-size: 13px; }
 .tag-gray { background: #e8e8e8; }
 .tag-blue { background: #d6e4ff; color: #1a73e8; }
+.tag-orange { background: #ffe7ba; color: #d46b08; }
 .tag-green { background: #d9f7be; color: #389e0d; }
 .tag-red { background: #ffd8d2; color: #cf1322; }
 .btn { padding: 8px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; }
 .btn-success { background: #52c41a; color: white; }
 .btn-danger { background: #e74c3c; color: white; }
 .btn-back { margin-top: 20px; background: #f0f0f0; color: #666; }
+/* 审核记录样式 */
+.reviews-section { margin-top: 0; }
+.review-record { border: 1px solid #eee; border-radius: 8px; padding: 12px 16px; margin-bottom: 10px; }
+.record-error { border-left: 3px solid #e74c3c; background: #fff5f5; }
+.record-warning { border-left: 3px solid #f0ad4e; background: #fffdf5; }
+.record-info { border-left: 3px solid #52c41a; background: #f6ffed; }
+.record-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.record-type { font-weight: 700; font-size: 13px; color: #333; }
+.record-severity { font-size: 12px; padding: 1px 8px; border-radius: 10px; }
+.sev-INFO { background: #d9f7be; color: #389e0d; }
+.sev-WARNING { background: #ffe7ba; color: #d46b08; }
+.sev-ERROR { background: #ffd8d2; color: #cf1322; }
+.record-body { font-size: 14px; color: #555; line-height: 1.6; }
+.record-footer { font-size: 13px; color: #888; margin-top: 6px; }
+.reviewing-hint { color: #999; font-size: 14px; padding: 16px 0; }
 </style>

@@ -1,7 +1,9 @@
 package com.watersupervision.controller;
 
 import com.watersupervision.entity.Material;
+import com.watersupervision.entity.ReviewRecord;
 import com.watersupervision.entity.User;
+import com.watersupervision.repository.ReviewRecordRepository;
 import com.watersupervision.repository.UserRepository;
 import com.watersupervision.service.MaterialService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,19 +11,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/materials")
 public class MaterialController {
 
     private final MaterialService materialService;
+    private final ReviewRecordRepository reviewRecordRepository;
     private final UserRepository userRepository;
 
-    public MaterialController(MaterialService materialService, UserRepository userRepository) {
+    public MaterialController(MaterialService materialService,
+                              ReviewRecordRepository reviewRecordRepository,
+                              UserRepository userRepository) {
         this.materialService = materialService;
+        this.reviewRecordRepository = reviewRecordRepository;
         this.userRepository = userRepository;
     }
 
@@ -38,12 +42,26 @@ public class MaterialController {
         return ResponseEntity.ok(materialService.listByApplicant(userId));
     }
 
-    /** 材料详情 */
+    /** 材料详情（含审核记录） */
     @GetMapping("/{id}")
-    public ResponseEntity<Material> detail(@PathVariable Long id) {
+    public ResponseEntity<Map<String, Object>> detail(@PathVariable Long id) {
         return materialService.getById(id)
-                .map(ResponseEntity::ok)
+                .map(material -> {
+                    Map<String, Object> result = new LinkedHashMap<>();
+                    result.put("material", material);
+                    List<ReviewRecord> records = reviewRecordRepository
+                            .findByMaterialIdOrderByReviewedAtDesc(id);
+                    result.put("reviewRecords", records);
+                    return ResponseEntity.ok(result);
+                })
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /** 获取某材料的审核记录 */
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<List<ReviewRecord>> reviews(@PathVariable Long id) {
+        return ResponseEntity.ok(
+                reviewRecordRepository.findByMaterialIdOrderByReviewedAtDesc(id));
     }
 
     /** 创建材料 */
