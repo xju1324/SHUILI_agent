@@ -4,6 +4,7 @@
       <router-link to="/" class="logo">涉水审批智能审核系统</router-link>
       <nav>
         <router-link to="/">首页</router-link>
+        <router-link to="/knowledge">🔬 知识检索</router-link>
         <template v-if="user">
           <router-link to="/profile" class="user-info">{{ user.realName || user.username }}</router-link>
           <a href="#" @click.prevent="handleLogout">退出</a>

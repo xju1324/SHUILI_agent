@@ -131,7 +131,7 @@ async def health():
 
 @app.post("/api/review")
 async def review_endpoint(req: MaterialReviewRequest):
-    """涉水审批材料智能审查（Agent 驱动）"""
+    """涉水审批材料智能审查"""
     material_data = req.model_dump(exclude_none=True)
     if req.formData:
         try:
@@ -140,7 +140,33 @@ async def review_endpoint(req: MaterialReviewRequest):
             pass
 
     try:
-        review_result = await water_agent.execute_review(material_data)
+        # 1. 完整性检查
+        completeness = await check_completeness(material_data)
+        # 2. 法规检索
+        search_query = _build_search_query(material_data)
+        regulations = await knowledge_search(query=search_query, category=req.category)
+        # 3. LLM 生成审查报告
+        from model.factory import create_llm
+        llm = create_llm()
+        prompt = f"""你是涉水审批智能审核助手。请根据以下信息生成审查报告：
+
+## 材料信息
+{json.dumps(material_data, ensure_ascii=False, indent=2)}
+
+## 完整性检查结果
+{completeness}
+
+## 相关法规
+{regulations}
+
+## 请按以下格式输出审查报告：
+### 一、完整性检查
+### 二、法规依据
+### 三、合规性评估（逐项标注 ✅合规 ⚠️需关注 ❌不合规）
+### 四、审查结论与修改建议"""
+        response = await llm.ainvoke(prompt)
+        review_result = response.content if hasattr(response, "content") else str(response)
+
         return {
             "material_id": req.material_id,
             "category": req.category,
