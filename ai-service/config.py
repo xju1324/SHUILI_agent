@@ -6,6 +6,10 @@ from dotenv import load_dotenv
 # 加载 .env 文件（优先级低于系统环境变量）
 load_dotenv(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
+# HuggingFace 镜像（国内加速）
+os.environ.setdefault("HF_ENDPOINT", os.getenv("HF_ENDPOINT", "https://hf-mirror.com"))
+os.environ.setdefault('HF_HUB_OFFLINE', os.getenv('HF_HUB_OFFLINE', '0'))
+
 # 服务配置
 HOST = os.getenv("AI_HOST", "0.0.0.0")
 PORT = int(os.getenv("AI_PORT", "8000"))
@@ -32,18 +36,10 @@ VERBOSE = os.getenv("VERBOSE", "true").lower() == "true"
 # ============================================================
 # Embedding 配置（支持 local / api 两种模式）
 # ============================================================
-# 模式: "local" 本地 HuggingFace 模型  |  "api" 外部 API
 EMBEDDING_MODE = os.getenv("EMBEDDING_MODE", "local")
-
-# local 模式: HuggingFace 模型名
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-zh-v1.5")
-
-# api 模式: OpenAI 兼容的嵌入 API
 EMBEDDING_API_KEY = os.getenv("EMBEDDING_API_KEY", "")
-# 火山方舟「Coding Plan」OpenAI 兼容地址通常为 /api/coding/v3；如使用其他供应商请在 .env 覆盖
-EMBEDDING_API_BASE = os.getenv(
-    "EMBEDDING_API_BASE", "https://ark.cn-beijing.volces.com/api/coding/v3"
-)
+EMBEDDING_API_BASE = os.getenv("EMBEDDING_API_BASE", "https://ark.cn-beijing.volces.com/api/coding/v3")
 EMBEDDING_API_MODEL = os.getenv("EMBEDDING_API_MODEL", "BAAI/bge-large-zh-v1.5")
 
 # 知识库文档目录
@@ -56,10 +52,7 @@ MCP_SERVER_NAME = "water-supervision-mcp"
 # ============================================================
 # LLM 配置（火山引擎 Ark / OpenAI 兼容）
 # ============================================================
-# 火山引擎 Ark 默认地址: https://ark.cn-beijing.volces.com/api/v3
-# 常用模型: doubao-1.5-pro-32k, deepseek-v3-250324, deepseek-r1-250120
 LLM_API_KEY = os.getenv("LLM_API_KEY", "")
-# 火山方舟「Coding Plan」OpenAI 兼容地址通常为 /api/coding/v3；如使用标准方舟或其他供应商请在 .env 覆盖
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://ark.cn-beijing.volces.com/api/coding/v3")
 LLM_MODEL = os.getenv("LLM_MODEL", "doubao-1.5-pro-32k")
 LLM_TEMPERATURE = float(os.getenv("LLM_TEMPERATURE", "0.1"))

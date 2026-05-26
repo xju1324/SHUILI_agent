@@ -100,7 +100,7 @@ _FILE_LABELS = {
     "applicationFormPath": "申请表",
     "businessLicensePath": "营业执照扫描件",
     "idCardPath": "身份证件",
-    "waterCertificatePath": "水资源论证报告",
+    "waterCertificatePath": "涉水相关报告",
 }
 
 

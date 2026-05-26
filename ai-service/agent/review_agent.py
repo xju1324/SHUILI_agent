@@ -1,9 +1,9 @@
-"""涉水审批智能审查 Agent — create_react_agent + 回调日志"""
+"""涉水审批智能审查 Agent —— 使用 Tool Calling 模式（兼容豆包）"""
 import json
 from typing import AsyncGenerator
 
-from langchain.agents import create_react_agent, AgentExecutor
-from langchain_core.prompts import PromptTemplate
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from model.factory import create_llm
 from utils.prompt_loader import load_system_prompt
@@ -16,7 +16,7 @@ logger = get_logger("review_agent")
 
 
 class WaterReviewAgent:
-    """涉水审批材料智能审查 Agent"""
+    """涉水审批材料智能审查 Agent（Tool Calling 模式）"""
 
     def __init__(self):
         self.llm = create_llm()
@@ -24,8 +24,13 @@ class WaterReviewAgent:
         self.tools = [knowledge_search, check_completeness]
         self.callbacks = [LoggingCallbackHandler()]
 
-        prompt = PromptTemplate.from_template(system_prompt)
-        agent = create_react_agent(llm=self.llm, tools=self.tools, prompt=prompt)
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", "{input}"),
+            MessagesPlaceholder(variable_name="agent_scratchpad"),
+        ])
+        
+        agent = create_tool_calling_agent(llm=self.llm, tools=self.tools, prompt=prompt)
         self.executor = AgentExecutor(
             agent=agent,
             tools=self.tools,

@@ -142,18 +142,30 @@ class RAGService:
         return total_chunks
 
     def search(self, query: str, k: int = 5) -> List[Dict]:
-        """语义检索，返回: 内容 + 来源 + 相似度分数"""
+        """语义检索，返回: 内容 + 来源 + 相似度分数（归一化0~1）"""
         if self.vector_store is None:
             return []
 
         results = self.vector_store.similarity_search_with_score(query, k=k)
+
+        def normalize(score: float) -> float:
+            """归一化分数: ChromaDB 余弦距离(0~2) → 相似度百分比(0~1)"""
+            s = float(score)
+            if s > 1.0:
+                # 余弦距离：0=相同 2=完全相反 → 转换: 1 - distance/2
+                s = max(0.0, 1.0 - s / 2.0)
+            elif s < 0:
+                # 内积可能为负，取绝对值归一化
+                s = 0.1
+            s = max(0.0, min(1.0, s))
+            return round(s, 4)
 
         return [
             {
                 "content": doc.page_content,
                 "source": doc.metadata.get("source", "unknown"),
                 "page": doc.metadata.get("page", None),
-                "score": round(float(score), 4),
+                "score": normalize(score),
             }
             for doc, score in results
         ]

@@ -44,7 +44,7 @@
           <li v-if="material.applicationFormPath">申请表: {{ material.applicationFormPath }}</li>
           <li v-if="material.businessLicensePath">营业执照: {{ material.businessLicensePath }}</li>
           <li v-if="material.idCardPath">身份证件: {{ material.idCardPath }}</li>
-          <li v-if="material.waterCertificatePath">论证报告: {{ material.waterCertificatePath }}</li>
+          <li v-if="material.waterCertificatePath">涉水相关报告: {{ material.waterCertificatePath }}</li>
         </ul>
         <p v-if="!hasFiles" class="no-files">暂无附件</p>
       </div>

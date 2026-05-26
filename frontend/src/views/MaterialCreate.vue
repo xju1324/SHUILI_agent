@@ -313,7 +313,7 @@ const uploadItems = [
   { field: 'applicationForm', label: '申请表', accept: '.doc,.docx,.pdf' },
   { field: 'businessLicense', label: '营业执照扫描件', accept: '.jpg,.png,.pdf' },
   { field: 'idCard', label: '身份证件', accept: '.jpg,.png' },
-  { field: 'waterCertificate', label: '论证报告', accept: '.pdf,.doc,.docx' }
+  { field: 'waterCertificate', label: '涉水相关报告', accept: '.pdf,.doc,.docx' }
 ]
 
 const uploadedFiles = reactive({})

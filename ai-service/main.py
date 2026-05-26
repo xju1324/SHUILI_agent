@@ -131,7 +131,7 @@ async def health():
 
 @app.post("/api/review")
 async def review_endpoint(req: MaterialReviewRequest):
-    """涉水审批材料智能审查（Agent 驱动）"""
+    """Agent-based AI review (original flow)"""
     material_data = req.model_dump(exclude_none=True)
     if req.formData:
         try:
@@ -139,22 +139,15 @@ async def review_endpoint(req: MaterialReviewRequest):
         except json.JSONDecodeError:
             pass
 
-    try:
-        review_result = await water_agent.execute_review(material_data)
-        return {
-            "material_id": req.material_id,
-            "category": req.category,
-            "review_result": review_result,
-            "status": "completed",
-        }
-    except Exception as e:
-        return {
-            "material_id": req.material_id,
-            "status": "failed",
-            "error": str(e),
-        }
+    result_text = await water_agent.execute_review(material_data)
+    result_text = _sanitize_review_output(result_text)
 
-
+    return {
+        "material_id": req.material_id,
+        "category": req.category,
+        "output": result_text,
+        "status": "completed",
+    }
 @app.post("/api/review/quick")
 async def quick_review(req: MaterialReviewRequest):
     """快速审查（仅执行完整性检查 + 法规检索，不经过 Agent）"""
@@ -264,6 +257,49 @@ app.mount("/mcp", mcp_subapp)
 # ============================================================
 # 辅助函数
 # ============================================================
+
+@app.post("/api/check")
+async def simple_check(req: MaterialReviewRequest):
+    """简单检查：只跑工具，不走 Agent，返回结构化结果"""
+    material_data = req.model_dump(exclude_none=True)
+    if req.formData:
+        try:
+            import json as _json
+            material_data.update(_json.loads(req.formData))
+        except Exception:
+            pass
+
+    completeness = await check_completeness(material_data)
+
+    search_query = _build_search_query(material_data)
+    regulations = await knowledge_search(query=search_query, category=req.category)
+
+    # Parse completeness result to determine pass/fail
+    is_complete = "缺失合计: 0" in completeness or "材料齐全" in completeness or "已填写完整" in completeness
+
+    return {
+        "material_id": req.material_id,
+        "category": req.category,
+        "completeness_check": completeness,
+        "regulation_reference": regulations,
+        "passed": is_complete,
+        "status": "completed",
+    }
+
+
+
+def _sanitize_review_output(text: str) -> str:
+    """Clean Agent output: remove emoji markers from section headers."""
+    import re
+    # Replace ✅⚠️❌ in headers (lines starting with #)
+    lines = text.split("\n")
+    cleaned = []
+    for line in lines:
+        if line.strip().startswith("#"):
+            line = re.sub(r"[✅⚠️❌]", "", line)
+        cleaned.append(line)
+    return "\n".join(cleaned)
+
 def _build_search_query(material_data: dict) -> str:
     """根据材料数据构建法规检索查询"""
     category = material_data.get("category", "WATER_INTAKE")
